@@ -87,13 +87,18 @@ function __bobthefish_git_branch -S -d 'Get the current git branch (or commitish
         and contains $branch $theme_git_default_branches
         and echo $branch_glyph
         and return
+        
+        set -l truncname $branch
+
+        [ "$theme_use_abbreviated_branch_name" = 'yes' ]
+        and set truncname (string replace -r '^(.{17}).{3,}(.{5})$' "\$1…\$2" $branch)
 
         # if the branch starts with a number and a dash, only use the number
         # truncate the middle of the branch name, but only if it's 25+ characters
-        set -l truncname $branch
-        if [ "$theme_use_abbreviated_branch_name" = 'yes' ]
-            set -l branch_short (string match -gr "^(\d+)-" "$branch"); and set -l truncname $branch_short; or set truncname (string replace -r '^(.{17}).{3,}(.{5})$' "\$1…\$2" $branch)
-        end
+        [ "$theme_use_abbreviated_branch_name" = 'yes' ]
+        and set -l branch_short (string match -gr "^(\d+)-" "$branch")
+        and set -l truncname $branch_short
+        
 
         echo $branch_glyph $truncname
         and return
